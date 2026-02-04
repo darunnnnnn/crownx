@@ -23,9 +23,7 @@ const Dashboard: React.FC = () => {
   const loadMonthlyData = useCallback(async () => {
     try {
       const expensesRes = await expenseAPI.getExpenses(selectedMonth, selectedYear);
-      if (!showAnalysis) {
-        setExpenses(expensesRes.data.slice(0, 3));
-      }
+      setExpenses(expensesRes.data.slice(0, 3));
     } catch (error) {
       console.error('Error loading monthly data:', error);
     }
