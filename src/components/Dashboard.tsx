@@ -8,13 +8,14 @@ const Dashboard: React.FC = () => {
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [showSavingsForm, setShowSavingsForm] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedYear] = useState(new Date().getFullYear().toString());
   const [loading, setLoading] = useState(true);
 
   const [transactionForm, setTransactionForm] = useState({
     amount: '',
     type: 'expense',
     description: '',
+    client: 'Others',
     date: new Date().toISOString().split('T')[0]
   });
 
@@ -59,6 +60,7 @@ const Dashboard: React.FC = () => {
         amount: amount,
         category: transactionForm.type === 'expense' ? 'Expense' : 'Income',
         description: transactionForm.description,
+        client: transactionForm.client,
         date: transactionForm.date
       });
       
@@ -67,6 +69,7 @@ const Dashboard: React.FC = () => {
         amount: '',
         type: 'expense',
         description: '',
+        client: 'Others',
         date: new Date().toISOString().split('T')[0]
       });
       
@@ -78,6 +81,20 @@ const Dashboard: React.FC = () => {
       setExpenses(expensesRes.data.slice(0, 3));
     } catch (error) {
       console.error('Error saving transaction:', error);
+    }
+  };
+
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await expenseAPI.deleteExpense(id);
+      const [statsRes, expensesRes] = await Promise.all([
+        dashboardAPI.getStats(),
+        expenseAPI.getExpenses(selectedMonth, selectedYear)
+      ]);
+      setStats(statsRes.data);
+      setExpenses(expensesRes.data.slice(0, 3));
+    } catch (error) {
+      console.error('Error deleting expense:', error);
     }
   };
 
@@ -111,6 +128,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Header */}
       <header className="header" style={{ paddingTop: '8px' }}>
         <div>
           <div className="app-title">CrownX Agency</div>
@@ -159,8 +177,8 @@ const Dashboard: React.FC = () => {
               <span className="material-icons-round">show_chart</span>
             </div>
           </div>
-          <p className="stat-label">Monthly Profit</p>
-          <h3 className="stat-value">₹{((stats?.monthlyIncome || 0) - (stats?.monthlyExpenses || 0)).toLocaleString()}</h3>
+          <p className="stat-label">Net Profit</p>
+          <h3 className="stat-value">₹{stats?.netProfit.toLocaleString() || '0'}</h3>
         </div>
       </div>
 
@@ -224,9 +242,23 @@ const Dashboard: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <p className={`activity-amount ${expense.amount < 0 ? 'positive' : 'negative'}`}>
-                {expense.amount < 0 ? '+' : '-'}₹{Math.abs(expense.amount).toLocaleString()}
-              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <p className={`activity-amount ${expense.amount < 0 ? 'positive' : 'negative'}`}>
+                  {expense.amount < 0 ? '+' : '-'}₹{Math.abs(expense.amount).toLocaleString()}
+                </p>
+                <button
+                  onClick={() => handleDeleteExpense(expense.id)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#ef4444',
+                    padding: '2px'
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: '14px' }}>delete</span>
+                </button>
+              </div>
             </div>
           ))}
 
@@ -295,6 +327,21 @@ const Dashboard: React.FC = () => {
                   className="form-input"
                   placeholder="0.00"
                 />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Client</label>
+                <select
+                  value={transactionForm.client}
+                  onChange={(e) => setTransactionForm({ ...transactionForm, client: e.target.value })}
+                  className="form-input"
+                >
+                  <option value="Sparsh">Sparsh</option>
+                  <option value="Enhance">Enhance</option>
+                  <option value="Aly">Aly</option>
+                  <option value="Greg">Greg</option>
+                  <option value="Others">Others</option>
+                  <option value="Studio 6">Studio 6</option>
+                </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Description</label>

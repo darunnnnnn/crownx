@@ -8,7 +8,8 @@ import {
   Timestamp,
   getDoc,
   setDoc,
-  doc
+  doc,
+  deleteDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Expense } from './types';
@@ -54,6 +55,10 @@ export const expenseAPI = {
       date: Timestamp.fromDate(new Date(expense.date)),
       created_at: Timestamp.now()
     });
+  },
+
+  deleteExpense: async (id: string) => {
+    await deleteDoc(doc(db, 'expenses', id));
   }
 };
 

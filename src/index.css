@@ -24,6 +24,14 @@ body {
   border-bottom: 1px solid #f1f5f9;
 }
 
+.welcome-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
 .app-title {
   font-size: 24px;
   font-weight: 700;
@@ -80,10 +88,18 @@ body {
 }
 
 .stats-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 24px;
+  display: flex;
+  gap: 16px;
+  padding: 32px 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.stats-container::-webkit-scrollbar {
+  display: none;
 }
 
 .stat-card {
@@ -91,6 +107,9 @@ body {
   padding: 24px;
   border-radius: 16px;
   border: 1px solid #f1f5f9;
+  min-width: 300px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .stat-header {
@@ -109,6 +128,50 @@ body {
   align-items: center;
   justify-content: center;
   color: #3b82f6;
+}
+
+.stat-card.primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+}
+
+.stat-card.secondary {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: white;
+  border: none;
+}
+
+.stat-card.tertiary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+  border: none;
+}
+
+.stat-card.primary .stat-icon,
+.stat-card.secondary .stat-icon,
+.stat-card.tertiary .stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.stat-card.primary .stat-label,
+.stat-card.secondary .stat-label,
+.stat-card.tertiary .stat-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-card.primary .stat-value,
+.stat-card.secondary .stat-value,
+.stat-card.tertiary .stat-value {
+  color: white;
+}
+
+.stat-card.primary .stat-change,
+.stat-card.secondary .stat-change,
+.stat-card.tertiary .stat-change {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .stat-icon.secondary {
@@ -149,7 +212,7 @@ body {
 .action-buttons {
   display: flex;
   gap: 12px;
-  padding: 0 24px 24px;
+  padding: 0 24px 32px;
 }
 
 .action-btn {
@@ -181,6 +244,7 @@ body {
 
 .activity-section {
   padding: 0 24px 100px;
+  margin-top: 8px;
 }
 
 .section-header {
