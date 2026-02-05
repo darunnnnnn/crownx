@@ -285,7 +285,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
                   </span>
                 </div>
                 <div>
-                  <h4 className="activity-title">{expense.description}</h4>
+                  <h4 className="activity-title">{expense.amount < 0 ? expense.client : expense.description}</h4>
                   <p className="activity-meta">
                     {expense.amount < 0 ? 'Income' : expense.category} • {formatTimeAgo(expense.created_at)}
                   </p>
