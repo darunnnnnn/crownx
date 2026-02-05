@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { dashboardAPI, expenseAPI } from '../firebaseApi';
 import { DashboardStats, Expense } from '../types';
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChange }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [showSavingsForm, setShowSavingsForm] = useState(false);
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString());
   const [selectedYear] = useState(new Date().getFullYear().toString());
   const [loading, setLoading] = useState(true);
@@ -16,8 +17,12 @@ const Dashboard: React.FC = () => {
     type: 'expense',
     description: '',
     client: 'Others',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    expenseType: 'others',
+    employee: ''
   });
+
+  const [currentStep, setCurrentStep] = useState(0);
 
   const [savingsAmount, setSavingsAmount] = useState('');
 
@@ -52,6 +57,10 @@ const Dashboard: React.FC = () => {
   const handleTransactionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const description = transactionForm.expenseType === 'salary' 
+        ? `Salary - ${transactionForm.employee}`
+        : transactionForm.description;
+      
       const amount = transactionForm.type === 'expense' 
         ? parseFloat(transactionForm.amount) 
         : -parseFloat(transactionForm.amount);
@@ -59,18 +68,21 @@ const Dashboard: React.FC = () => {
       await expenseAPI.addExpense({
         amount: amount,
         category: transactionForm.type === 'expense' ? 'Expense' : 'Income',
-        description: transactionForm.description,
+        description: description,
         client: transactionForm.client,
         date: transactionForm.date
       });
       
       setShowTransactionForm(false);
+      setCurrentStep(0);
       setTransactionForm({
         amount: '',
         type: 'expense',
         description: '',
         client: 'Others',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        expenseType: 'others',
+        employee: ''
       });
       
       const [statsRes, expensesRes] = await Promise.all([
@@ -81,6 +93,36 @@ const Dashboard: React.FC = () => {
       setExpenses(expensesRes.data.slice(0, 3));
     } catch (error) {
       console.error('Error saving transaction:', error);
+    }
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < getMaxSteps() - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const getMaxSteps = () => {
+    if (transactionForm.type === 'expense' && transactionForm.expenseType === 'salary') {
+      return 5;
+    }
+    return 4;
+  };
+
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 0: return transactionForm.amount !== '';
+      case 1: return transactionForm.client !== '';
+      case 2: return transactionForm.expenseType !== '';
+      case 3: return transactionForm.expenseType !== 'salary' || transactionForm.employee !== '';
+      case 4: return transactionForm.date !== '';
+      default: return false;
     }
   };
 
@@ -144,8 +186,8 @@ const Dashboard: React.FC = () => {
       <div style={{ height: '16px' }}></div>
 
       <div className="tab-nav">
-        <button className="tab-btn active">Dashboard</button>
-        <button className="tab-btn">Editors</button>
+        <button className="tab-btn active" onClick={() => onTabChange('dashboard')}>Dashboard</button>
+        <button className="tab-btn" onClick={() => onTabChange('editors')}>Editors</button>
       </div>
 
       <div className="stats-container">
@@ -196,6 +238,13 @@ const Dashboard: React.FC = () => {
         >
           <span className="material-icons-round text-sm">add</span>
           Add Expense
+        </button>
+        <button 
+          className="action-btn income"
+          onClick={() => setShowIncomeForm(true)}
+        >
+          <span className="material-icons-round text-sm">add</span>
+          Add Income
         </button>
       </div>
 
@@ -302,85 +351,238 @@ const Dashboard: React.FC = () => {
 
       {showTransactionForm && (
         <div className="modal-overlay" onClick={() => setShowTransactionForm(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">Add Transaction</div>
-            <form onSubmit={handleTransactionSubmit}>
-              <div className="form-group">
-                <label className="form-label">Type</label>
-                <select
-                  value={transactionForm.type}
-                  onChange={(e) => setTransactionForm({ ...transactionForm, type: e.target.value })}
-                  className="form-input"
+          <div className="modal-clean" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-clean">
+              <h3>Add Expense</h3>
+              <div className="step-indicator">
+                Step {currentStep + 1} of {getMaxSteps()}
+              </div>
+            </div>
+            
+            <div className="form-step">
+              {currentStep === 0 && (
+                <div className="step-content">
+                  <h4>Enter Amount</h4>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={transactionForm.amount}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, amount: e.target.value })}
+                    className="step-input"
+                    placeholder="₹ 0.00"
+                    autoFocus
+                  />
+                </div>
+              )}
+              
+              {currentStep === 1 && (
+                <div className="step-content">
+                  <h4>Select Client</h4>
+                  <select
+                    value={transactionForm.client}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, client: e.target.value })}
+                    className="step-input"
+                  >
+                    <option value="Sparsh">Sparsh</option>
+                    <option value="Enhance">Enhance</option>
+                    <option value="Aly">Aly</option>
+                    <option value="Greg">Greg</option>
+                    <option value="Others">Others</option>
+                    <option value="Studio 6">Studio 6</option>
+                  </select>
+                </div>
+              )}
+              
+              {currentStep === 2 && (
+                <div className="step-content">
+                  <h4>Expense Type</h4>
+                  <div className="type-buttons">
+                    <button
+                      type="button"
+                      className={`type-btn ${transactionForm.expenseType === 'salary' ? 'active' : ''}`}
+                      onClick={() => setTransactionForm({ ...transactionForm, expenseType: 'salary' })}
+                    >
+                      Salary
+                    </button>
+                    <button
+                      type="button"
+                      className={`type-btn ${transactionForm.expenseType === 'others' ? 'active' : ''}`}
+                      onClick={() => setTransactionForm({ ...transactionForm, expenseType: 'others' })}
+                    >
+                      Others
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {currentStep === 3 && transactionForm.expenseType === 'salary' && (
+                <div className="step-content">
+                  <h4>Select Employee</h4>
+                  <select
+                    value={transactionForm.employee}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, employee: e.target.value })}
+                    className="step-input"
+                  >
+                    <option value="">Select Employee</option>
+                    <option value="Sanjose">Sanjose</option>
+                    <option value="Abishek">Abishek</option>
+                    <option value="Tharun">Tharun</option>
+                    <option value="Yuvanesh">Yuvanesh</option>
+                    <option value="Nithin">Nithin</option>
+                  </select>
+                </div>
+              )}
+              
+              {currentStep === 3 && transactionForm.expenseType === 'others' && (
+                <div className="step-content">
+                  <h4>Description</h4>
+                  <input
+                    type="text"
+                    value={transactionForm.description}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, description: e.target.value })}
+                    className="step-input"
+                    placeholder="What was this expense for?"
+                  />
+                </div>
+              )}
+              
+              {((currentStep === 4) || (currentStep === 3 && transactionForm.expenseType === 'others')) && (
+                <div className="step-content">
+                  <h4>Date: {new Date().toLocaleDateString()}</h4>
+                  <p style={{ color: '#64748b', fontSize: '14px' }}>Using today's date</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="step-actions">
+              {currentStep > 0 && (
+                <button
+                  type="button"
+                  onClick={handlePrevStep}
+                  className="step-btn secondary"
                 >
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Amount (₹)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={transactionForm.amount}
-                  onChange={(e) => setTransactionForm({ ...transactionForm, amount: e.target.value })}
-                  className="form-input"
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Client</label>
-                <select
-                  value={transactionForm.client}
-                  onChange={(e) => setTransactionForm({ ...transactionForm, client: e.target.value })}
-                  className="form-input"
+                  Back
+                </button>
+              )}
+              
+              {currentStep < getMaxSteps() - 1 ? (
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  disabled={!canProceedToNext()}
+                  className="step-btn primary"
                 >
-                  <option value="Sparsh">Sparsh</option>
-                  <option value="Enhance">Enhance</option>
-                  <option value="Aly">Aly</option>
-                  <option value="Greg">Greg</option>
-                  <option value="Others">Others</option>
-                  <option value="Studio 6">Studio 6</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Description</label>
-                <input
-                  type="text"
-                  required
-                  value={transactionForm.description}
-                  onChange={(e) => setTransactionForm({ ...transactionForm, description: e.target.value })}
-                  className="form-input"
-                  placeholder={transactionForm.type === 'expense' ? 'What was this expense for?' : 'What was this income from?'}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Date</label>
-                <input
-                  type="date"
-                  required
-                  value={transactionForm.date}
-                  onChange={(e) => setTransactionForm({ ...transactionForm, date: e.target.value })}
-                  className="form-input"
-                />
+                  Next
+                </button>
+              ) : (
+                <button
+                  onClick={handleTransactionSubmit}
+                  disabled={!canProceedToNext()}
+                  className="step-btn primary"
+                >
+                  Add Expense
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showIncomeForm && (
+        <div className="modal-overlay" onClick={() => setShowIncomeForm(false)}>
+          <div className="modal-clean" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-clean">
+              <h3>Add Income</h3>
+            </div>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await expenseAPI.addExpense({
+                  amount: -parseFloat(transactionForm.amount),
+                  category: 'Income',
+                  description: transactionForm.description,
+                  client: transactionForm.client,
+                  date: new Date().toISOString().split('T')[0]
+                });
+                
+                setShowIncomeForm(false);
+                setTransactionForm({
+                  amount: '',
+                  type: 'expense',
+                  description: '',
+                  client: 'Others',
+                  date: new Date().toISOString().split('T')[0],
+                  expenseType: 'others',
+                  employee: ''
+                });
+                
+                const [statsRes, expensesRes] = await Promise.all([
+                  dashboardAPI.getStats(),
+                  expenseAPI.getExpenses(selectedMonth, selectedYear)
+                ]);
+                setStats(statsRes.data);
+                setExpenses(expensesRes.data.slice(0, 3));
+              } catch (error) {
+                console.error('Error saving income:', error);
+              }
+            }}>
+              <div style={{ padding: '24px' }}>
+                <div className="form-group">
+                  <label className="form-label">Amount (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={transactionForm.amount}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, amount: e.target.value })}
+                    className="form-input"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Client</label>
+                  <select
+                    value={transactionForm.client}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, client: e.target.value })}
+                    className="form-input"
+                  >
+                    <option value="Sparsh">Sparsh</option>
+                    <option value="Enhance">Enhance</option>
+                    <option value="Aly">Aly</option>
+                    <option value="Greg">Greg</option>
+                    <option value="Others">Others</option>
+                    <option value="Studio 6">Studio 6</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
+                  <input
+                    type="text"
+                    required
+                    value={transactionForm.description}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, description: e.target.value })}
+                    className="form-input"
+                    placeholder="What was this income from?"
+                  />
+                </div>
               </div>
               <div className="form-actions">
                 <button
                   type="button"
-                  onClick={() => setShowTransactionForm(false)}
+                  onClick={() => setShowIncomeForm(false)}
                   className="action-btn btn-secondary"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="action-btn primary">
-                  Add {transactionForm.type === 'expense' ? 'Expense' : 'Income'}
+                <button type="submit" className="action-btn income">
+                  Add Income
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
       {showSavingsForm && (
         <div className="modal-overlay" onClick={() => setShowSavingsForm(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

@@ -14,6 +14,13 @@ export interface Expense {
   founder_id: string;
   founder_name: string;
   created_at: string;
+  client?: string;
+}
+
+export interface EditorStats {
+  name: string;
+  videosEdited: number;
+  totalCost: number;
 }
 
 export interface DashboardStats {

@@ -9,10 +9,11 @@ import {
   getDoc,
   setDoc,
   doc,
-  deleteDoc
+  deleteDoc,
+  and
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Expense } from './types';
+import { Expense, EditorStats } from './types';
 
 export const expenseAPI = {
   getExpenses: async (month?: string, year?: string) => {
@@ -40,7 +41,8 @@ export const expenseAPI = {
         founder_id: 'user1',
         founder_name: 'User',
         date: data.date ? data.date.toDate().toISOString().split('T')[0] : '',
-        created_at: data.created_at ? data.created_at.toDate().toISOString() : ''
+        created_at: data.created_at ? data.created_at.toDate().toISOString() : '',
+        client: data.client || 'Others'
       };
     });
     
@@ -108,5 +110,42 @@ export const dashboardAPI = {
       total_amount: amount,
       updated_at: Timestamp.now()
     });
+  }
+};
+
+export const editorsAPI = {
+  getEditorStats: async () => {
+    const editors = ['Sanjose', 'Abishek', 'Tharun', 'Yuvanesh', 'Nithin'];
+    const stats: EditorStats[] = [];
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    const startDate = new Date(currentYear, currentMonth - 1, 1);
+    const endDate = new Date(currentYear, currentMonth, 0);
+
+    for (const editorName of editors) {
+      const q = query(
+        collection(db, 'expenses'),
+        where('description', '>=', `Salary - ${editorName}`),
+        where('description', '<=', `Salary - ${editorName}\uf8ff`)
+      );
+      
+      const snapshot = await getDocs(q);
+      const monthlyDocs = snapshot.docs.filter(doc => {
+        const docDate = doc.data().date.toDate();
+        return docDate >= startDate && docDate <= endDate;
+      });
+      
+      const totalCost = monthlyDocs.reduce((sum, doc) => sum + doc.data().amount, 0);
+      const videosEdited = monthlyDocs.length;
+
+      stats.push({
+        name: editorName,
+        videosEdited,
+        totalCost
+      });
+    }
+
+    return { data: stats.sort((a, b) => b.videosEdited - a.videosEdited) };
   }
 };

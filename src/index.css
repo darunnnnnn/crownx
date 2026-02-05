@@ -227,6 +227,11 @@ body {
   transition: all 0.2s;
 }
 
+.action-btn.income {
+  background: #10b981;
+  color: white;
+}
+
 .action-btn.primary {
   background: #3b82f6;
   color: white;
@@ -385,6 +390,122 @@ body {
   z-index: 1000;
 }
 
+.modal-clean {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header-clean {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.modal-header-clean h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.step-indicator {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.form-step {
+  padding: 32px 24px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-content {
+  width: 100%;
+  text-align: center;
+}
+
+.step-content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.step-input {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.step-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.type-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.type-btn {
+  padding: 16px 32px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.type-btn.active {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+}
+
+.step-actions {
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.step-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.step-btn.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.step-btn.primary:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.step-btn.secondary {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 .modal {
   background: white;
   border-radius: 16px;
@@ -434,4 +555,82 @@ body {
   height: 100vh;
   font-size: 18px;
   color: #64748b;
+}
+
+.editor-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editor-card {
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.editor-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.editor-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.editor-videos {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.editor-bar-container {
+  width: 100%;
+  height: 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.editor-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.editor-cost {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cost-label {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.cost-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
 }
