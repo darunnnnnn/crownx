@@ -29,7 +29,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
   const loadMonthlyData = useCallback(async () => {
     try {
       const expensesRes = await expenseAPI.getExpenses(selectedMonth, selectedYear);
-      setExpenses(expensesRes.data.slice(0, 3));
+      setExpenses(expensesRes.data);
     } catch (error) {
       console.error('Error loading monthly data:', error);
     }
@@ -43,7 +43,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
           expenseAPI.getExpenses(selectedMonth, selectedYear)
         ]);
         setStats(statsRes.data);
-        setExpenses(expensesRes.data.slice(0, 3));
+        setExpenses(expensesRes.data);
         setSavingsAmount(statsRes.data.totalSavings.toString());
       } catch (error) {
         console.error('Error loading data:', error);
@@ -90,7 +90,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
         expenseAPI.getExpenses(selectedMonth, selectedYear)
       ]);
       setStats(statsRes.data);
-      setExpenses(expensesRes.data.slice(0, 3));
+      setExpenses(expensesRes.data);
     } catch (error) {
       console.error('Error saving transaction:', error);
     }
@@ -134,7 +134,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
         expenseAPI.getExpenses(selectedMonth, selectedYear)
       ]);
       setStats(statsRes.data);
-      setExpenses(expensesRes.data.slice(0, 3));
+      setExpenses(expensesRes.data);
     } catch (error) {
       console.error('Error deleting expense:', error);
     }
@@ -522,7 +522,7 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
                   expenseAPI.getExpenses(selectedMonth, selectedYear)
                 ]);
                 setStats(statsRes.data);
-                setExpenses(expensesRes.data.slice(0, 3));
+                setExpenses(expensesRes.data);
               } catch (error) {
                 console.error('Error saving income:', error);
               }

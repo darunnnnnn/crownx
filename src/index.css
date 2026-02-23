@@ -250,6 +250,25 @@ body {
 .activity-section {
   padding: 0 24px 100px;
   margin-top: 8px;
+  max-height: calc(100vh - 520px);
+  overflow-y: auto;
+}
+
+.activity-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activity-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activity-section::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.activity-section::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .section-header {
@@ -277,7 +296,7 @@ body {
   background: white;
   border-radius: 16px;
   border: 1px solid #f1f5f9;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .activity-item {
