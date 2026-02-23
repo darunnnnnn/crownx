@@ -222,6 +222,16 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
           <p className="stat-label">Net Profit</p>
           <h3 className="stat-value">₹{stats?.netProfit.toLocaleString() || '0'}</h3>
         </div>
+
+        <div className="stat-card quaternary">
+          <div className="stat-header">
+            <div className="stat-icon">
+              <span className="material-icons-round">account_balance</span>
+            </div>
+          </div>
+          <p className="stat-label">Money in Bank</p>
+          <h3 className="stat-value">₹{((stats?.netProfit || 0) + (stats?.totalSavings || 0)).toLocaleString()}</h3>
+        </div>
       </div>
 
       <div className="action-buttons">

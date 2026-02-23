@@ -148,28 +148,38 @@ body {
   border: none;
 }
 
+.stat-card.quaternary {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+}
+
 .stat-card.primary .stat-icon,
 .stat-card.secondary .stat-icon,
-.stat-card.tertiary .stat-icon {
+.stat-card.tertiary .stat-icon,
+.stat-card.quaternary .stat-icon {
   background: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
 .stat-card.primary .stat-label,
 .stat-card.secondary .stat-label,
-.stat-card.tertiary .stat-label {
+.stat-card.tertiary .stat-label,
+.stat-card.quaternary .stat-label {
   color: rgba(255, 255, 255, 0.9);
 }
 
 .stat-card.primary .stat-value,
 .stat-card.secondary .stat-value,
-.stat-card.tertiary .stat-value {
+.stat-card.tertiary .stat-value,
+.stat-card.quaternary .stat-value {
   color: white;
 }
 
 .stat-card.primary .stat-change,
 .stat-card.secondary .stat-change,
-.stat-card.tertiary .stat-change {
+.stat-card.tertiary .stat-change,
+.stat-card.quaternary .stat-change {
   background: rgba(255, 255, 255, 0.2);
   color: white;
 }
