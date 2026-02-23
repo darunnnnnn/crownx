@@ -258,7 +258,7 @@ body {
 }
 
 .activity-section {
-  padding: 0 24px 100px;
+  padding: 0 24px 40px;
   margin-top: 8px;
   max-height: calc(100vh - 520px);
   overflow-y: auto;

@@ -340,25 +340,6 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
         </div>
       </section>
 
-      <nav className="bottom-nav">
-        <button className="nav-item active">
-          <span className="material-icons-round nav-icon">dashboard</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-item">
-          <span className="material-icons-round nav-icon">pie_chart</span>
-          <span>Stats</span>
-        </button>
-        <button className="nav-item">
-          <span className="material-icons-round nav-icon">account_circle</span>
-          <span>Profile</span>
-        </button>
-        <button className="nav-item">
-          <span className="material-icons-round nav-icon">settings</span>
-          <span>Settings</span>
-        </button>
-      </nav>
-
       {showTransactionForm && (
         <div className="modal-overlay" onClick={() => setShowTransactionForm(false)}>
           <div className="modal-clean" onClick={(e) => e.stopPropagation()}>
