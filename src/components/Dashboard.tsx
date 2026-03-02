@@ -437,10 +437,15 @@ const Dashboard: React.FC<{ onTabChange: (tab: string) => void }> = ({ onTabChan
                 </div>
               )}
               
-              {((currentStep === 4) || (currentStep === 3 && transactionForm.expenseType === 'others')) && (
+              {((currentStep === 4 && transactionForm.expenseType === 'salary') || (currentStep === 3 && transactionForm.expenseType === 'others')) && (
                 <div className="step-content">
-                  <h4>Date: {new Date().toLocaleDateString()}</h4>
-                  <p style={{ color: '#64748b', fontSize: '14px' }}>Using today's date</p>
+                  <h4>Select Date</h4>
+                  <input
+                    type="date"
+                    value={transactionForm.date}
+                    onChange={(e) => setTransactionForm({ ...transactionForm, date: e.target.value })}
+                    className="step-input"
+                  />
                 </div>
               )}
             </div>
